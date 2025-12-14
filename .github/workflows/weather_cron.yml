@@ -1,0 +1,35 @@
+name: Weather Station Hourly
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+  workflow_dispatch:      # Manual trigger button
+
+jobs:
+  run_weather_bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # We install psycopg2-binary even though SQL will fail, 
+      # because your script imports it. If we don't install it, the script crashes on "ImportError".
+      - name: Install libraries
+        run: |
+          pip install pandas requests sqlalchemy psycopg2-binary
+
+      - name: Run Weather Script
+        run: python "Weather Station/weather_station.py"
+        # Note: I added "Weather Station/" because your file is inside that folder!
+
+      - name: Upload CSV Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bangalore-weather-data
+          path: Weather Station/weather_bangalore.csv

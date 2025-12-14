@@ -1,3 +1,5 @@
+from urllib.parse import quote_plus
+from sqlalchemy import create_engine
 import requests
 import json
 import logging
@@ -54,15 +56,28 @@ def transform_data(raw_data):
     return df
 
 def load_data(df):
-    """LOAD: Saves the DataFrame to a CSV file"""
-    logging.info("Step 3: Loading data to CSV...")
+    """LOAD: Saves data to PostgreSQL"""
+    logging.info("Step 3: Loading data to SQL...")
     
-    filename = "crypto_prices.csv"
-    # index=False removes the row numbers (0, 1) from the file
-    df.to_csv(filename, index=False)
+    # --- SAFE CONNECTION SETUP ---
+    # 1. Type your password here (even if it has @, %, !, etc.)
+    password = "Shubham@1" 
     
-    logging.info(f"Data successfully saved to {filename}")
-
+    # 2. This cleans the password safely (e.g., '@' becomes '%40')
+    encoded_pass = quote_plus(password)
+    
+    # 3. Create the connection string using the cleaned password
+    # Note the 'f' at the start for f-string formatting
+    db_connection_str = f'postgresql://postgres:{encoded_pass}@localhost:5432/postgres'
+    db_connection = create_engine(db_connection_str)
+    # -----------------------------
+    
+    try:
+        df.to_sql('crypto_prices', db_connection, if_exists='append', index=False)
+        logging.info("Data successfully loaded into PostgreSQL!")
+        
+    except Exception as e:
+        logging.error(f"Failed to load data to SQL: {e}")
 # 3. MAIN PIPELINE
 if __name__ == "__main__":
     # A. Extract
