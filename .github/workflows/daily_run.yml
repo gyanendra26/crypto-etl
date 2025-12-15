@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pandas requests
+          pip install pandas requests sqlalchemy psycopg2-binar
 
       - name: Run ETL Script
         run: python extract.py
