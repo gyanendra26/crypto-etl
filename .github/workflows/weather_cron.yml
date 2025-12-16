@@ -1,5 +1,7 @@
 name: Weather Station Hourly
 
+
+
 on:
   schedule:
     - cron: '0 * * * *'  # Run every hour
@@ -25,9 +27,10 @@ jobs:
           pip install pandas requests sqlalchemy psycopg2-binary
 
       - name: Run Weather Script
-        run: python "Weather Station/weather_station.py"
-        # Note: I added "Weather Station/" because your file is inside that folder!
-
+        run: |
+          cd "Weather Station"
+          python weather_station.py
+          
       - name: Upload CSV Artifact
         uses: actions/upload-artifact@v4
         with:
